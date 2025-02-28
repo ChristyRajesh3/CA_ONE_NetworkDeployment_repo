@@ -1,15 +1,39 @@
 trigger:
-  - main
+  - main  # Trigger the pipeline on changes to the main branch
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-latest'  # Use an Ubuntu agent for compatibility
 
-steps:
-  - script: |
-     ansible-playbook -i '74.235.62.114', playbook.yml -u azureuser --extra-vars "ansible_ssh_pass=Password1234!"
-    displayName: 'Configure Server'
+jobs:
+- job: Configure_Server
+  displayName: 'Configure Server with Ansible'
+  steps:
+    - script: |
+        echo "Installing Ansible..."
+        sudo apt-get update
+        sudo apt-get install -y ansible
+      displayName: 'Install Ansible'
 
-  - script: |
-     docker build -t myapp .
-     docker run -d -p 80:80 myapp
-    displayName: 'Deploy Docker Container'
+    - script: |
+        echo "Running Ansible Playbook..."
+        ansible-playbook -i '74.235.62.114,' playbook.yml -u azureuser --extra-vars "ansible_ssh_pass=Password1234!"
+      displayName: 'Run Ansible Playbook'
+
+- job: Deploy_Docker_Container
+  displayName: 'Deploy Docker Container'
+  dependsOn: Configure_Server  # Ensure this job runs after the Ansible job
+  steps:
+    - script: |
+        echo "Building and Running Docker Container..."
+        docker build -t myapp .
+        docker run -d -p 80:80 myapp
+      displayName: 'Build and Run Docker Container'
+
+- job: ParallelJob
+  displayName: 'Parallel Job Example'
+  dependsOn: Deploy_Docker_Container  # Ensure this job runs after the Docker job
+  strategy:
+    parallel: 5  # Number of parallel jobs
+  steps:
+    - script: echo Running parallel job
+      displayName: 'Run Parallel Job'
