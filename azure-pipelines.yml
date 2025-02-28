@@ -1,8 +1,8 @@
 trigger:
-  - main  # Trigger the pipeline on changes to the main branch
+  - main
 
 pool:
-  vmImage: 'ubuntu-latest'  # Use an Ubuntu agent for compatibility
+  vmImage: 'ubuntu-latest'
 
 jobs:
 - job: Configure_Server
@@ -21,19 +21,10 @@ jobs:
 
 - job: Deploy_Docker_Container
   displayName: 'Deploy Docker Container'
-  dependsOn: Configure_Server  # Ensure this job runs after the Ansible job
+  dependsOn: Configure_Server
   steps:
     - script: |
         echo "Building and Running Docker Container..."
         docker build -t myapp .
         docker run -d -p 80:80 myapp
       displayName: 'Build and Run Docker Container'
-
-- job: ParallelJob
-  displayName: 'Parallel Job Example'
-  dependsOn: Deploy_Docker_Container  # Ensure this job runs after the Docker job
-  strategy:
-    parallel: 5  # Number of parallel jobs
-  steps:
-    - script: echo Running parallel job
-      displayName: 'Run Parallel Job'
