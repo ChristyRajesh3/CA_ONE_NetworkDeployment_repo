@@ -9,10 +9,15 @@ jobs:
   displayName: 'Configure Server with Ansible'
   steps:
     - script: |
-        echo "Installing Ansible..."
+        echo "Installing dependencies..."
         sudo apt-get update
         sudo apt-get install -y ansible
-      displayName: 'Install Ansible'
+      displayName: 'Install Dependencies'
+
+    - script: |
+        echo "Testing SSH connection..."
+        ssh -o StrictHostKeyChecking=no azureuser@74.235.62.114 echo "SSH connection successful!"
+      displayName: 'Test SSH Connection'
 
     - script: |
         echo "Running Ansible Playbook..."
@@ -23,6 +28,12 @@ jobs:
   displayName: 'Deploy Docker Container'
   dependsOn: Configure_Server
   steps:
+    - script: |
+        echo "Installing Docker..."
+        sudo apt-get update
+        sudo apt-get install -y docker.io
+      displayName: 'Install Docker'
+
     - script: |
         echo "Building and Running Docker Container..."
         docker build -t myapp .
