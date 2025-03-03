@@ -2,7 +2,7 @@ trigger:
   - main
 
 pool:
-  NAME: 'Azure Pipeline'
+  NAME: 'Azure Pipelines'
 
 jobs:
 - job: Configure_Server
