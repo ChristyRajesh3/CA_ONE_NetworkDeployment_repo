@@ -2,7 +2,7 @@ trigger:
   - main
 
 pool:
-  NAME: 'Azure Pipelines'
+  vmImage: 'ubuntu-latest'  # Use a Microsoft-hosted agent or self-hosted agent
 
 jobs:
 - job: Configure_Server
@@ -26,7 +26,7 @@ jobs:
 
 - job: Deploy_Docker_Container
   displayName: 'Deploy Docker Container'
-  dependsOn: Configure_Server
+  dependsOn: Configure_Server  # This job will only run after Configure_Server completes
   steps:
     - script: |
         echo "Installing Docker..."
