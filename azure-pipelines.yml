@@ -2,7 +2,7 @@ trigger:
   - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  NAME: 'Azure Pipeline'
 
 jobs:
 - job: Configure_Server
