@@ -2,38 +2,39 @@ trigger:
   - main
 
 pool:
-  name: 'Azure Pipelines'  # Use a Microsoft-hosted agent or self-hosted agent
+  vmImage: 'ubuntu-latest'  # Use a Microsoft-hosted agent or self-hosted agent
 
 jobs:
-- job: Configure_Server
-  displayName: 'Configure Server with Ansible'
+- job: Configure_and_Deploy
+  displayName: 'Configure Server and Deploy Docker Container'
   steps:
+    # Step 1: Install Ansible
     - script: |
         echo "Installing dependencies..."
         sudo apt-get update
         sudo apt-get install -y ansible
       displayName: 'Install Dependencies'
 
+    # Step 2: Test SSH connection
     - script: |
         echo "Testing SSH connection..."
         ssh -o StrictHostKeyChecking=no azureuser@74.235.62.114 echo "SSH connection successful!"
       displayName: 'Test SSH Connection'
 
+    # Step 3: Run Ansible Playbook
     - script: |
         echo "Running Ansible Playbook..."
         ansible-playbook -i '74.235.62.114,' playbook.yml -u azureuser --extra-vars "ansible_ssh_pass=Password1234!" -vvv
       displayName: 'Run Ansible Playbook'
 
-- job: Deploy_Docker_Container
-  displayName: 'Deploy Docker Container'
-  dependsOn: Configure_Server  # This job will only run after Configure_Server completes
-  steps:
+    # Step 4: Install Docker
     - script: |
         echo "Installing Docker..."
         sudo apt-get update
         sudo apt-get install -y docker.io
       displayName: 'Install Docker'
 
+    # Step 5: Build and Run Docker Container
     - script: |
         echo "Building and Running Docker Container..."
         docker build -t myapp .
